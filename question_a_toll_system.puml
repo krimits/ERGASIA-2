@@ -1,0 +1,96 @@
+@startuml Toll Road System - Domain Model
+
+' Question A: Domain model for toll road management system
+' Author: Σύστημα Διαχείρισης Διοδίων
+
+class TollStation {
+  - stationId: String
+  - location: String
+  - stationName: String
+  --
+  + processVehiclePass(vehicle: Vehicle): TollCharge
+  + captureVehicle(vehicle: Vehicle, timestamp: DateTime): void
+}
+
+class Vehicle {
+  - licensePlate: String
+  - vehicleCategory: VehicleCategory
+  --
+  + getCategory(): VehicleCategory
+  + getLicensePlate(): String
+}
+
+class VehicleCategory {
+  - categoryId: String
+  - categoryName: String
+  - description: String
+  --
+  + getCategoryId(): String
+  + getCategoryName(): String
+}
+
+class TollCharge {
+  - chargeId: String
+  - amount: Decimal
+  - timestamp: DateTime
+  - station: TollStation
+  - vehicle: Vehicle
+  --
+  + calculateCharge(): Decimal
+}
+
+class Route {
+  - routeId: String
+  - startStation: TollStation
+  - endStation: TollStation
+  - distance: Decimal
+  - minimumTravelTime: Duration
+  --
+  + getMinimumTravelTime(): Duration
+  + isConsecutiveStations(): Boolean
+}
+
+class SpeedViolation {
+  - violationId: String
+  - vehicle: Vehicle
+  - route: Route
+  - actualTravelTime: Duration
+  - detectionTimestamp: DateTime
+  - reported: Boolean
+  --
+  + detectViolation(): Boolean
+  + reportToPolice(): void
+}
+
+class DailyPoliceReport {
+  - reportId: String
+  - reportDate: Date
+  - violations: List<SpeedViolation>
+  --
+  + generateReport(): void
+  + submitToPolice(): void
+}
+
+' Relationships
+TollStation "2" -- "1..*" Route : "connected by"
+Route "1" -- "0..*" SpeedViolation : "monitors"
+Vehicle "1" -- "1" VehicleCategory : "belongs to"
+Vehicle "1" -- "0..*" TollCharge : "generates"
+Vehicle "1" -- "0..*" SpeedViolation : "commits"
+TollStation "1" -- "0..*" TollCharge : "collects"
+TollStation "1" -- "0..*" VehicleCategory : "has pricing for"
+DailyPoliceReport "1" *-- "0..*" SpeedViolation : "contains"
+
+note right of Route
+  Minimum travel time is calculated
+  based on speed limit for route.
+  Used to detect speed violations.
+end note
+
+note bottom of SpeedViolation
+  A violation is detected when actual
+  travel time < minimum travel time
+  between consecutive stations.
+end note
+
+@enduml
