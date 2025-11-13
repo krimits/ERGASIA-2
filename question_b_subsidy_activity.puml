@@ -1,0 +1,71 @@
+@startuml Heating Oil Subsidy - Activity Diagram
+
+' Question B: Activity diagram for heating oil subsidy application process
+' Author: Σύστημα Επιδόματος Πετρελαίου Θέρμανσης
+
+start
+
+:Δικαιούχος υποβάλλει ηλεκτρονική αίτηση;
+note right
+  Η αίτηση περιλαμβάνει:
+  - ΑΦΜ
+  - Αριθμός τραπεζικού λογαριασμού
+  - Ύψος δαπάνης πετρελαίου
+  - Αριθμός παροχής ηλεκτρικού ρεύματος
+end note
+
+:Λήψη στοιχείων αίτησης;
+
+' Check 1: VAT Number Validation
+:Έλεγχος α) Το ΑΦΜ είναι έγκυρο;
+
+if (ΑΦΜ έγκυρο;) then (ΟΧΙ)
+  :Αποστολή email
+  απόρριψης αίτησης;
+  stop
+else (ΝΑΙ)
+  ' Check 2: Income Validation
+  :Έλεγχος β) Εισόδημα
+  προηγούμενου έτους ≤ 20.000€;
+  
+  if (Εισόδημα ≤ 20.000€;) then (ΟΧΙ)
+    :Αποστολή email
+    απόρριψης αίτησης;
+    stop
+  else (ΝΑΙ)
+    ' Check 3: Duplicate Application Check
+    :Έλεγχος γ) Δεν έχει υποβάλει
+    άλλη αίτηση στο τρέχον έτος;
+    
+    if (Υπάρχει άλλη αίτηση;) then (ΝΑΙ)
+      :Αποστολή email
+      απόρριψης αίτησης;
+      stop
+    else (ΟΧΙ)
+      ' Check 4: Electricity Number Validation
+      :Έλεγχος δ) Έγκυρος αριθμός
+      παροχής ηλεκτρικού ρεύματος;
+      
+      if (Αριθμός παροχής έγκυρος;) then (ΟΧΙ)
+        :Αποστολή email
+        απόρριψης αίτησης;
+        stop
+      else (ΝΑΙ)
+        ' All checks passed - Approve
+        :Έγκριση αίτησης;
+        
+        :Αυτόματη καταβολή επιδόματος;
+        
+        :Ενημέρωση τραπεζικού
+        λογαριασμού δικαιούχου;
+        
+        :Αποστολή email
+        επιτυχούς καταβολής;
+        
+        stop
+      endif
+    endif
+  endif
+endif
+
+@enduml
